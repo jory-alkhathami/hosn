@@ -7,6 +7,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function initChart() {
     const ctx = document.getElementById('riskChart').getContext('2d');
+    
+    // Gradient fill for chart
+    let gradient = ctx.createLinearGradient(0, 0, 0, 200);
+    gradient.addColorStop(0, 'rgba(181, 156, 174, 0.4)');
+    gradient.addColorStop(1, 'rgba(181, 156, 174, 0.0)');
+
     riskChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -15,19 +21,21 @@ function initChart() {
                 label: 'مستوى المخاطرة (%)',
                 data: journeyHistory,
                 borderColor: '#B59CAE',
-                backgroundColor: 'rgba(181, 156, 174, 0.25)',
+                borderWidth: 3,
+                backgroundColor: gradient,
                 fill: true,
-                tension: 0.3
+                tension: 0.4,
+                pointBackgroundColor: '#E2D7E0'
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                y: { min: 0, max: 100, grid: { color: '#2D2633' } },
-                x: { grid: { color: '#2D2633' } }
+                y: { min: 0, max: 100, grid: { color: 'rgba(181, 156, 174, 0.1)' }, ticks: { color: '#A396A1' } },
+                x: { grid: { color: 'rgba(181, 156, 174, 0.1)' }, ticks: { color: '#A396A1' } }
             },
-            plugins: { legend: { labels: { color: '#D4C3CF' } } }
+            plugins: { legend: { labels: { color: '#E2D7E0', font: { family: 'Tajawal' } } } }
         }
     });
 }
@@ -54,33 +62,30 @@ function updateDashboard(data) {
 
     scoreDisplay.innerText = `${score}%`;
 
-    let colorClass = 'text-mauve';
-    let bgBadge = 'bg-mauve';
-    let borderColor = '#B59CAE';
+    let colorStyle = '#B59CAE';
+    let bgBadge = 'bg-mauve-badge';
 
     if (score >= 75) {
-        colorClass = 'text-danger';
-        bgBadge = 'bg-danger';
-        borderColor = '#dc3545';
+        colorStyle = '#E65C5C';
+        bgBadge = 'bg-danger text-white';
     } else if (score >= 45) {
-        colorClass = 'text-warning';
+        colorStyle = '#E6A15C';
         bgBadge = 'bg-warning text-dark';
-        borderColor = '#ffc107';
     }
 
-    scoreDisplay.className = `display-1 fw-bold ${colorClass}`;
-    badge.className = `badge ${bgBadge} fs-6 mt-2`;
+    scoreDisplay.style.color = colorStyle;
+    badge.className = `badge ${bgBadge} px-3 py-2 fs-6`;
     badge.innerText = `${data.risk_level} RISK`;
     recBox.innerText = data.recommendation;
 
     factorsList.innerHTML = '';
     if (data.risk_factors.length === 0) {
-        factorsList.innerHTML = '<div class="text-mauve"><i class="bi bi-check-circle-fill"></i> لا توجد مؤشرات خطر. السلوك اعتيادي.</div>';
+        factorsList.innerHTML = '<div class="text-mauve"><i class="bi bi-check-circle-fill me-1"></i> لا توجد مؤشرات خطر. السلوك اعتيادي.</div>';
     } else {
         data.risk_factors.forEach(f => {
             factorsList.innerHTML += `
-                <div class="alert alert-dark border-secondary py-1 px-2 mb-1 d-flex justify-content-between align-items-center">
-                    <span>${f.signal}</span>
+                <div class="alert alert-dark border-secondary py-2 px-3 mb-2 d-flex justify-content-between align-items-center rounded-3">
+                    <span class="small">${f.signal}</span>
                     <span class="badge bg-danger">${f.impact}</span>
                 </div>
             `;
@@ -91,8 +96,7 @@ function updateDashboard(data) {
     if (journeyHistory.length > 7) journeyHistory.shift();
     
     riskChart.data.datasets[0].data = journeyHistory;
-    riskChart.data.datasets[0].borderColor = borderColor;
-    riskChart.data.datasets[0].backgroundColor = `${borderColor}44`;
+    riskChart.data.datasets[0].borderColor = colorStyle;
     riskChart.update();
 
     appendLog(`[RESPONSE]: النتيجة: ${score}% | القرار: ${data.action_code}`);
