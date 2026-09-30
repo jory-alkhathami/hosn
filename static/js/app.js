@@ -14,8 +14,8 @@ function initChart() {
             datasets: [{
                 label: 'مستوى المخاطرة (%)',
                 data: journeyHistory,
-                borderColor: '#198754',
-                backgroundColor: 'rgba(25, 135, 84, 0.2)',
+                borderColor: '#B59CAE',
+                backgroundColor: 'rgba(181, 156, 174, 0.25)',
                 fill: true,
                 tension: 0.3
             }]
@@ -24,10 +24,10 @@ function initChart() {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                y: { min: 0, max: 100, grid: { color: '#333' } },
-                x: { grid: { color: '#333' } }
+                y: { min: 0, max: 100, grid: { color: '#2D2633' } },
+                x: { grid: { color: '#2D2633' } }
             },
-            plugins: { legend: { labels: { color: '#fff' } } }
+            plugins: { legend: { labels: { color: '#D4C3CF' } } }
         }
     });
 }
@@ -54,9 +54,9 @@ function updateDashboard(data) {
 
     scoreDisplay.innerText = `${score}%`;
 
-    let colorClass = 'text-success';
-    let bgBadge = 'bg-success';
-    let borderColor = '#198754';
+    let colorClass = 'text-mauve';
+    let bgBadge = 'bg-mauve';
+    let borderColor = '#B59CAE';
 
     if (score >= 75) {
         colorClass = 'text-danger';
@@ -75,7 +75,7 @@ function updateDashboard(data) {
 
     factorsList.innerHTML = '';
     if (data.risk_factors.length === 0) {
-        factorsList.innerHTML = '<div class="text-success"><i class="bi bi-check-circle-fill"></i> لا توجد مؤشرات خطر. السلوك اعتيادي.</div>';
+        factorsList.innerHTML = '<div class="text-mauve"><i class="bi bi-check-circle-fill"></i> لا توجد مؤشرات خطر. السلوك اعتيادي.</div>';
     } else {
         data.risk_factors.forEach(f => {
             factorsList.innerHTML += `
@@ -92,7 +92,7 @@ function updateDashboard(data) {
     
     riskChart.data.datasets[0].data = journeyHistory;
     riskChart.data.datasets[0].borderColor = borderColor;
-    riskChart.data.datasets[0].backgroundColor = `${borderColor}33`;
+    riskChart.data.datasets[0].backgroundColor = `${borderColor}44`;
     riskChart.update();
 
     appendLog(`[RESPONSE]: النتيجة: ${score}% | القرار: ${data.action_code}`);
