@@ -1,40 +1,162 @@
-from flask import Flask, render_template, jsonify
+import datetime
+from flask import Flask, jsonify, render_template, request
 
 app = Flask(__name__)
 
-CASES = [
-    {"id":"H360-0247","customer":"نورة العتيبي","amount":"8,700 ر.س","score":87,"level":"مرتفع","status":"بانتظار القرار","time":"10:42","scenario":"fraud"},
-    {"id":"H360-0246","customer":"سارة الحربي","amount":"4,250 ر.س","score":58,"level":"مراقبة","status":"قيد المراجعة","time":"10:18","scenario":"watch"},
-    {"id":"H360-0245","customer":"عبدالله الغامدي","amount":"980 ر.س","score":21,"level":"منخفض","status":"مراقبة آلية","time":"09:54","scenario":"normal"},
-    {"id":"H360-0244","customer":"ريم القحطاني","amount":"12,400 ر.س","score":76,"level":"مرتفع","status":"تحقق إضافي","time":"09:41","scenario":"fraud"},
-]
 
-SCENARIOS = {
-    "normal": {"id":"H360-0245","name":"نشاط اعتيادي","customer":"عبدالله الغامدي","account":"•• 7712","amount":"980 ر.س","base_score":12,"action":"السماح مع المراقبة","events":[
-        {"time":"09:49","title":"تسجيل دخول من جهاز موثوق","delta":0,"status":"طبيعي","category":"الجهاز","detail":"الجهاز سبق استخدامه في جلسات موثوقة."},
-        {"time":"09:51","title":"تحويل إلى مستفيد معروف","delta":2,"status":"طبيعي","category":"المستفيد","detail":"المستفيد مسجل منذ أكثر من 8 أشهر."},
-        {"time":"09:53","title":"المبلغ ضمن النمط المعتاد","delta":4,"status":"طبيعي","category":"المعاملة","detail":"القيمة ضمن نطاق التحويلات المعتاد للعميل."},
-        {"time":"09:54","title":"لا توجد مؤشرات مترابطة","delta":3,"status":"طبيعي","category":"الترابط","detail":"لا توجد سلسلة إشارات تستدعي رفع مستوى الخطر."}]},
-    "watch": {"id":"H360-0246","name":"حالة تحت المراقبة","customer":"سارة الحربي","account":"•• 2140","amount":"4,250 ر.س","base_score":16,"action":"استمرار المراقبة","events":[
-        {"time":"10:08","title":"دخول من جهاز معروف","delta":0,"status":"طبيعي","category":"الجهاز","detail":"الجهاز معروف لكن الجلسة بدأت في توقيت غير معتاد."},
-        {"time":"10:12","title":"مستفيد أضيف حديثًا","delta":13,"status":"مراقبة","category":"المستفيد","detail":"المستفيد أضيف خلال آخر 24 ساعة."},
-        {"time":"10:15","title":"قيمة أعلى من المتوسط","delta":14,"status":"مراقبة","category":"القيمة","detail":"المبلغ أعلى من متوسط آخر التحويلات، لكنه ليس خارج الحدود كليًا."},
-        {"time":"10:18","title":"تقارب زمني بين الإشارات","delta":15,"status":"مراقبة","category":"الترابط","detail":"عدة مؤشرات متوسطة ظهرت خلال نافذة زمنية قصيرة."}]},
-    "fraud": {"id":"H360-0247","name":"اشتباه هندسة اجتماعية","customer":"نورة العتيبي","account":"•• 4831","amount":"8,700 ر.س","base_score":18,"action":"تحقق إضافي قبل التنفيذ","events":[
-        {"time":"10:31","title":"تسجيل دخول من جهاز موثوق","delta":0,"status":"طبيعي","category":"الجهاز","detail":"الجهاز معروف؛ لا توجد مخاطرة مستقلة في تسجيل الدخول."},
-        {"time":"10:34","title":"إضافة مستفيد جديد","delta":15,"status":"مراقبة","category":"المستفيد","detail":"مستفيد أضيف للمرة الأولى قبل دقائق من محاولة الدفع."},
-        {"time":"10:36","title":"تغيّر غير معتاد في مسار الاستخدام","delta":12,"status":"مراقبة","category":"السلوك","detail":"تتابع الشاشات والمدة يختلفان عن النمط المعتاد للجلسات السابقة."},
-        {"time":"10:39","title":"أول دفعة للمستفيد الجديد","delta":20,"status":"مرتفع","category":"المعاملة","detail":"محاولة دفع أولى بعد 5 دقائق فقط من إضافة المستفيد."},
-        {"time":"10:41","title":"المبلغ ينحرف عن نمط العميل","delta":18,"status":"مرتفع","category":"القيمة","detail":"القيمة أعلى من النطاق المعتاد للتحويلات الحديثة."},
-        {"time":"10:42","title":"ترابط عدة مؤشرات خلال 8 دقائق","delta":4,"status":"مرتفع","category":"الترابط","detail":"المحرك ربط الإشارات السابقة كسلسلة واحدة بدل تقييم كل حدث منفردًا."}]}
-}
+def calculate_risk_score(data):
+    """محرك تقييم المخاطر السلوكية والمالية (Risk Intelligence Engine)"""
+    score = 0
+    factors = []
 
-@app.route('/')
-def home(): return render_template('index.html')
-@app.route('/api/cases')
-def cases(): return jsonify(CASES)
-@app.route('/api/scenario/<name>')
-def scenario(name): return jsonify(SCENARIOS.get(name, SCENARIOS['normal']))
+    # 1. تحليل تغيير الجهاز والشبكة (Device & Network Signals)
+    if data.get("is_new_device"):
+        score += 25
+        factors.append(
+            {
+                "signal": "جهاز جديد/غير معروف",
+                "impact": "+25%",
+                "severity": "medium",
+            }
+        )
 
-if __name__ == '__main__':
-    app.run(debug=True, host='127.0.0.1', port=5000)
+    if data.get("vpn_or_proxy"):
+        score += 30
+        factors.append(
+            {
+                "signal": "استخدام VPN أو شبكة مضللة (Proxy/Tor)",
+                "impact": "+30%",
+                "severity": "high",
+            }
+        )
+
+    if data.get("ip_country_changed"):
+        score += 35
+        factors.append(
+            {
+                "signal": "تغيير مفاجئ في النطاق الجغرافي للـ IP",
+                "impact": "+35%",
+                "severity": "high",
+            }
+        )
+
+    # 2. تحليل السلوك اللحظي (Behavioral Cadence & Biometrics)
+    typing_speed = data.get("typing_speed_ms", 150)
+    if typing_speed < 40:
+        score += 20
+        factors.append(
+            {
+                "signal": "نمط مدخلات آلي (Bot-like Automation / Paste)",
+                "impact": "+20%",
+                "severity": "medium",
+            }
+        )
+
+    failed_logins = data.get("failed_login_attempts", 0)
+    if failed_logins >= 3:
+        score += 25
+        factors.append(
+            {
+                "signal": f"محاولات دخول فاشلة متكررة ({failed_logins} محاولات)",
+                "impact": "+25%",
+                "severity": "high",
+            }
+        )
+
+    # 3. تحليل المعاملات المالية (Transactional Risk Signals)
+    amount = data.get("amount", 0)
+    avg_user_amount = data.get("avg_user_amount", 500)
+
+    if amount > (avg_user_amount * 5):
+        score += 40
+        factors.append(
+            {
+                "signal": f"مبلغ المعاملة ({amount} ر.س) يتجاوز نمط العميل الاعتيادي بأضعاف",
+                "impact": "+40%",
+                "severity": "critical",
+            }
+        )
+
+    final_score = min(score, 100)
+
+    if final_score >= 75:
+        level = "CRITICAL"
+        recommendation = "حظر المعاملة وتجميد الحساب موقتاً (BLOCK)"
+        action_code = "ACTION_BLOCK"
+    elif final_score >= 45:
+        level = "HIGH"
+        recommendation = "طلب تحقق إضافي عبر المصادقة الثنائية (MFA Challenge)"
+        action_code = "ACTION_MFA"
+    elif final_score >= 20:
+        level = "MEDIUM"
+        recommendation = "السماح بالعملية مع وضع الحساب تحت المراقبة (FLAG)"
+        action_code = "ACTION_FLAG"
+    else:
+        level = "LOW"
+        recommendation = "معاملة آمنة - السماح الفوري (ALLOW)"
+        action_code = "ACTION_ALLOW"
+
+    return {
+        "risk_score": final_score,
+        "risk_level": level,
+        "recommendation": recommendation,
+        "action_code": action_code,
+        "risk_factors": factors,
+        "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+
+@app.route("/api/assess_risk", methods=["POST"])
+def assess_risk():
+    data = request.get_json() or {}
+    result = calculate_risk_score(data)
+    return jsonify(result)
+
+
+@app.route("/api/simulate/<scenario_type>", methods=["GET"])
+def simulate_scenario(scenario_type):
+    if scenario_type == "normal":
+        mock_data = {
+            "is_new_device": False,
+            "vpn_or_proxy": False,
+            "ip_country_changed": False,
+            "typing_speed_ms": 140,
+            "failed_login_attempts": 0,
+            "amount": 250,
+            "avg_user_amount": 300,
+        }
+    elif scenario_type == "account_takeover":
+        mock_data = {
+            "is_new_device": True,
+            "vpn_or_proxy": True,
+            "ip_country_changed": True,
+            "typing_speed_ms": 20,
+            "failed_login_attempts": 4,
+            "amount": 1200,
+            "avg_user_amount": 300,
+        }
+    elif scenario_type == "suspicious_transaction":
+        mock_data = {
+            "is_new_device": True,
+            "vpn_or_proxy": False,
+            "ip_country_changed": False,
+            "typing_speed_ms": 110,
+            "failed_login_attempts": 1,
+            "amount": 8500,
+            "avg_user_amount": 400,
+        }
+    else:
+        mock_data = {}
+
+    result = calculate_risk_score(mock_data)
+    result["input_data"] = mock_data
+    return jsonify(result)
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
