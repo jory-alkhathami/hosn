@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حُصن 360 | HOSN 360 - منصة ذكاء الاحتيال والمخاطر</title>
+    <title>حُصن | HOSN - منصة ذكاء الاحتيال والمخاطر</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-dark text-light">
+<body>
 
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-black border-bottom border-secondary">
+    <nav class="navbar navbar-expand-lg border-bottom">
         <div class="container">
-            <a class="navbar-brand fw-bold text-success fs-3" href="#">
-                <i class="bi bi-shield-check"></i> HOSN 360 <span class="badge bg-danger fs-6">Live Engine</span>
+            <a class="navbar-brand fw-bold text-mauve fs-3" href="#">
+                <i class="bi bi-shield-check"></i> حُصن | HOSN <span class="badge bg-mauve fs-6">Live Engine</span>
             </a>
             <span class="navbar-text text-muted small">
                 Fraud Intelligence & Risk Correlation System
@@ -25,13 +25,13 @@
 
     <div class="container my-4">
         <!-- Banner المسابقة -->
-        <div class="alert alert-dark border-success d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div class="alert alert-custom d-flex align-items-center justify-content-between flex-wrap gap-2 rounded-3">
             <div>
-                <h5 class="mb-1 text-success"><i class="bi bi-award"></i> نموذج مسابقة سيف العالمية للأمن والابتكار</h5>
-                <p class="mb-0 text-secondary small">منظومة استباقية لربط الإشارات السلوكية والمالية واكتشاف الاحتيال في الوقت الفعلي.</p>
+                <h5 class="mb-1 text-mauve"><i class="bi bi-award"></i> نموذج مسابقة سيف العالمية للأمن والابتكار</h5>
+                <p class="mb-0 text-mauve-light small">منظومة استباقية لربط الإشارات السلوكية والمالية واكتشاف الاحتيال في الوقت الفعلي.</p>
             </div>
             <div class="d-flex gap-2 flex-wrap">
-                <button onclick="runSimulation('normal')" class="btn btn-outline-success btn-sm">
+                <button onclick="runSimulation('normal')" class="btn btn-outline-mauve btn-sm">
                     <i class="bi bi-check-circle"></i> محاكاة سلوك طبيعي
                 </button>
                 <button onclick="runSimulation('account_takeover')" class="btn btn-outline-danger btn-sm">
@@ -46,22 +46,22 @@
         <div class="row g-4 mt-1">
             <!-- Left Panel: Live Risk Score & Meter -->
             <div class="col-lg-5">
-                <div class="card bg-black border-secondary h-100 p-3">
-                    <h5 class="card-title text-center text-secondary border-bottom pb-2">مؤشر درجة المخاطرة اللحظية</h5>
+                <div class="card card-custom h-100 p-3">
+                    <h5 class="card-title text-center text-mauve border-bottom border-secondary pb-2">مؤشر درجة المخاطرة اللحظية</h5>
                     <div class="text-center my-4">
-                        <div id="riskScoreDisplay" class="display-1 fw-bold text-success">0%</div>
-                        <div id="riskBadge" class="badge bg-success fs-6 mt-2">LOW RISK</div>
+                        <div id="riskScoreDisplay" class="display-1 fw-bold text-mauve">0%</div>
+                        <div id="riskBadge" class="badge bg-mauve fs-6 mt-2">LOW RISK</div>
                     </div>
                     
                     <div class="mb-3">
-                        <label class="form-label text-secondary small">التوصية الأمنية الحالية:</label>
+                        <label class="form-label text-mauve-light small">التوصية الأمنية الحالية:</label>
                         <div id="recommendationBox" class="p-3 rounded bg-dark border border-secondary text-center fw-bold">
                             في انتظار إجراء معاملة أو محاكاة...
                         </div>
                     </div>
 
                     <!-- Risk Factors Breakdown -->
-                    <h6 class="text-secondary mt-3"><i class="bi bi-list-stars"></i> إشارات الخطر المكتشفة (Explainability):</h6>
+                    <h6 class="text-mauve mt-3"><i class="bi bi-list-stars"></i> إشارات الخطر المكتشفة (Explainability):</h6>
                     <div id="riskFactorsList" class="small text-muted">
                         لا توجد مخاطر مكتشفة حتى الآن.
                     </div>
@@ -70,16 +70,16 @@
 
             <!-- Right Panel: Chart & Journey Timeline -->
             <div class="col-lg-7">
-                <div class="card bg-black border-secondary h-100 p-3">
-                    <h5 class="card-title text-secondary border-bottom pb-2">مراقبة رحلة العميل (Customer Journey Risk Chart)</h5>
+                <div class="card card-custom h-100 p-3">
+                    <h5 class="card-title text-mauve border-bottom border-secondary pb-2">مراقبة رحلة العميل (Customer Journey Risk Chart)</h5>
                     <div style="height: 250px;">
                         <canvas id="riskChart"></canvas>
                     </div>
                     
                     <hr class="border-secondary my-3">
-                    <h6 class="text-secondary"><i class="bi bi-clock-history"></i> سجل الأحداث السلوكية (Audit Log)</h6>
-                    <div id="auditLog" class="p-2 bg-dark rounded small overflow-auto" style="height: 120px; font-family: monospace;">
-                        [SYSTEM]: HOSN 360 Fraud Engine Ready...
+                    <h6 class="text-mauve"><i class="bi bi-clock-history"></i> سجل الأحداث السلوكية (Audit Log)</h6>
+                    <div id="auditLog" class="p-2 rounded small overflow-auto" style="height: 120px;">
+                        [SYSTEM]: HOSN Fraud Engine Ready...
                     </div>
                 </div>
             </div>
