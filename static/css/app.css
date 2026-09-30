@@ -1,74 +1,150 @@
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
+/* ==========================================================================
+   HOSN System - Main Stylesheet (app.css)
+   Theme: Dark Slate & PANTONE Mauve (#B59CAE) + Glassmorphism
+   ========================================================================== */
 
+/* 1. المتغيرات الرئيسية بالألوان والهوية البصرية */
 :root {
-    --bg-main: #0F0C13;
-    --bg-card: #1A1522;
-    --bg-card-hover: #231C2E;
-    --mauve-main: #B59CAE;
-    --mauve-light: #E2D7E0;
-    --mauve-dark: #816A7A;
-    --mauve-border: rgba(181, 156, 174, 0.2);
-    --text-primary: #F5F2F5;
-    --text-muted: #A396A1;
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-card: rgba(30, 41, 59, 0.75);
+    --border-color: rgba(255, 255, 255, 0.15);
+    
+    /* اللون الرئيسي للهوية البصرية */
+    --accent-mauve: #B59CAE;
+    --accent-mauve-hover: #c9b4c3;
+    --accent-mauve-light: rgba(181, 156, 174, 0.2);
+    
+    /* ألوان النصوص المعدلة للوضوح العالي */
+    --text-primary: #ffffff;
+    --text-secondary: #cbd5e1; /* فاتح وواضح للوصف والنصوص الفرعية */
+    --text-muted: #94a3b8;      /* حل مشكلة النصوص غير المقروءة */
+    
+    /* ألوان حالات المخاطر */
+    --color-low: #10b981;       /* أخضر - مخاطر منخفضة */
+    --color-medium: #f59e0b;    /* أصفر - مخاطر متوسطة */
+    --color-high: #f97316;      /* برتقالي - مخاطر عالية */
+    --color-critical: #ef4444;  /* أحمر - مخاطر حرجة */
 }
 
+/* 2. الإعدادات العامة للموقع */
 body {
-    background-color: var(--bg-main) !important;
-    color: var(--text-primary) !important;
-    font-family: 'Tajawal', sans-serif !important;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    margin: 0;
+    padding-bottom: 2rem;
 }
 
-/* Navbar Styling */
-.navbar {
-    background-color: #09070C !important;
-    border-bottom: 1px solid var(--mauve-border) !important;
-    padding: 1rem 0;
+/* 3. إصلاح شفافية النصوص والأوصاف الفرعية */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary);
+    font-weight: 600;
 }
 
-/* Custom Cards */
-.card-custom {
+p, .subtitle, .card-subtitle, small, span.text-muted {
+    color: var(--text-secondary) !important; /* يضمن ظهور الكود رمادي فاتح مريح للعين */
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+/* 4. تصميم البطاقات واللوحات (Glassmorphism Cards) */
+.card, .glass-panel {
     background: var(--bg-card) !important;
-    border: 1px solid var(--mauve-border) !important;
-    border-radius: 18px !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
-}
-
-.text-mauve {
-    color: var(--mauve-main) !important;
-}
-
-.bg-mauve-badge {
-    background-color: rgba(181, 156, 174, 0.15) !important;
-    color: var(--mauve-light) !important;
-    border: 1px solid var(--mauve-border);
-}
-
-/* Buttons */
-.btn-mauve-outline {
-    border: 1px solid var(--mauve-border);
-    color: var(--mauve-light);
-    background: rgba(181, 156, 174, 0.05);
-    border-radius: 10px;
-    transition: all 0.3s ease;
-}
-
-.btn-mauve-outline:hover {
-    background: var(--mauve-main);
-    color: #0F0C13;
-    border-color: var(--mauve-main);
-}
-
-.alert-custom {
-    background: linear-gradient(135deg, #1C1625 0%, #251E30 100%) !important;
-    border: 1px solid var(--mauve-border) !important;
-    border-radius: 16px !important;
-}
-
-#auditLog {
-    background-color: #0B090F !important;
-    border: 1px solid var(--mauve-border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color) !important;
     border-radius: 12px;
-    color: #D6C8D3;
-    font-family: monospace;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    padding: 1rem 1.25rem;
+}
+
+/* 5. شريط الملاحة العلوي (Navbar) */
+.navbar {
+    background: rgba(15, 23, 42, 0.85) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.badge-version {
+    background-color: var(--accent-mauve-light);
+    color: var(--accent-mauve);
+    border: 1px solid var(--accent-mauve);
+    border-radius: 20px;
+    padding: 0.35em 0.75em;
+    font-size: 0.85rem;
+}
+
+/* 6. أزرار سيناريوهات المحاكاة */
+.btn-sim {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+}
+
+.btn-sim:hover {
+    background: var(--accent-mauve-light);
+    border-color: var(--accent-mauve);
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+/* 7. شاشة السجل التشغيلي البرمجي (Audit Log Terminal) */
+.terminal-window {
+    background-color: #090d16;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-family: 'Courier New', Courier, monospace;
+    color: #10b981;
+    padding: 1rem;
+    height: 220px;
+    overflow-y: auto;
+    direction: ltr;
+    text-align: left;
+}
+
+.terminal-line {
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+}
+
+/* 8. مؤشر شارة الخطورة (Risk Status Badges) */
+.status-badge {
+    padding: 0.5em 1em;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.status-low { background: rgba(16, 185, 129, 0.2); color: var(--color-low); border: 1px solid var(--color-low); }
+.status-medium { background: rgba(245, 158, 11, 0.2); color: var(--color-medium); border: 1px solid var(--color-medium); }
+.status-high { background: rgba(249, 115, 22, 0.2); color: var(--color-high); border: 1px solid var(--color-high); }
+.status-critical { background: rgba(239, 68, 68, 0.2); color: var(--color-critical); border: 1px solid var(--color-critical); }
+
+/* 9. تخصيص شريط التمرير (Scrollbar) */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-mauve);
 }
