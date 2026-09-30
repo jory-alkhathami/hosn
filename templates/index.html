@@ -16,30 +16,30 @@
         <div class="container">
             <a class="navbar-brand fw-bold text-mauve fs-3 d-flex align-items-center gap-2" href="#">
                 <i class="bi bi-shield-lock-fill"></i> حُصن | HOSN 
-                <span class="badge bg-mauve-badge fs-6">Live Engine</span>
+                <span class="badge bg-mauve-badge fs-6">v1.0 Live</span>
             </a>
-            <span class="text-muted small">
-                Fraud Intelligence & Risk Correlation System
+            <span class="text-muted small d-none d-md-inline">
+                Fraud Intelligence & Risk Correlation Platform
             </span>
         </div>
     </nav>
 
     <div class="container my-4">
-        <!-- Banner المسابقة -->
+        <!-- Live Operations Panel -->
         <div class="alert alert-custom p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
             <div>
-                <h5 class="mb-1 text-mauve fw-bold"><i class="bi bi-award-fill me-1"></i> نموذج مسابقة سيف العالمية للأمن والابتكار</h5>
-                <p class="mb-0 text-muted small">منظومة استباقية لربط الإشارات السلوكية والمالية واكتشاف الاحتيال في الوقت الفعلي.</p>
+                <h5 class="mb-1 text-mauve fw-bold"><i class="bi bi-sliders me-1"></i> وحدة التشغيل ومحاكاة المخاطر اللحظية</h5>
+                <p class="mb-0 text-muted small">منظومة أمنية استباقية لربط الإشارات السلوكية والمالية واكتشاف التهديدات فور وقوعها.</p>
             </div>
             <div class="d-flex gap-2 flex-wrap">
                 <button onclick="runSimulation('normal')" class="btn btn-mauve-outline btn-sm px-3">
-                    <i class="bi bi-check-circle-fill text-success me-1"></i> محاكاة سلوك طبيعي
+                    <i class="bi bi-check-circle-fill text-success me-1"></i> محاكاة سلوك اعتيادي
                 </button>
                 <button onclick="runSimulation('account_takeover')" class="btn btn-mauve-outline btn-sm px-3">
-                    <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i> محاكاة محاولة اختراق (ATO)
+                    <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i> محاكاة هجوم (ATO)
                 </button>
                 <button onclick="runSimulation('suspicious_transaction')" class="btn btn-mauve-outline btn-sm px-3">
-                    <i class="bi bi-currency-dollar text-warning me-1"></i> محاكاة معاملة مشبوهة
+                    <i class="bi bi-currency-dollar text-warning me-1"></i> محاكاة معاملة عالية المخاطر
                 </button>
             </div>
         </div>
@@ -48,23 +48,23 @@
             <!-- Left Panel: Live Risk Score & Meter -->
             <div class="col-lg-5">
                 <div class="card card-custom h-100 p-4">
-                    <h6 class="text-mauve text-center fw-bold border-bottom border-secondary pb-3 mb-4">مؤشر درجة المخاطرة اللحظية</h6>
+                    <h6 class="text-mauve text-center fw-bold border-bottom border-secondary pb-3 mb-4">مؤشر تقييم المخاطر اللحظي</h6>
                     <div class="text-center my-3">
                         <div id="riskScoreDisplay" class="display-2 fw-bold text-mauve mb-2">0%</div>
                         <div id="riskBadge" class="badge bg-mauve-badge px-3 py-2 fs-6">LOW RISK</div>
                     </div>
                     
                     <div class="my-4">
-                        <label class="form-label text-muted small">التوصية الأمنية الحالية:</label>
+                        <label class="form-label text-muted small">القرار والتوصية الأمنية:</label>
                         <div id="recommendationBox" class="p-3 rounded-3 bg-dark border border-secondary text-center fw-bold text-light">
-                            في انتظار إجراء معاملة أو محاكاة...
+                            في انتظار استقبال بيانات السلوك...
                         </div>
                     </div>
 
                     <!-- Risk Factors Breakdown -->
-                    <h6 class="text-mauve fs-6 fw-bold mt-2"><i class="bi bi-list-nested me-1"></i> إشارات الخطر المكتشفة (Explainability):</h6>
+                    <h6 class="text-mauve fs-6 fw-bold mt-2"><i class="bi bi-list-nested me-1"></i> تفاصيل مؤشرات الخطر (Risk Analysis):</h6>
                     <div id="riskFactorsList" class="small text-muted mt-2">
-                        لا توجد مخاطر مكتشفة حتى الآن.
+                        لا توجد إشارات مشبوهة حالياً.
                     </div>
                 </div>
             </div>
@@ -72,15 +72,15 @@
             <!-- Right Panel: Chart & Journey Timeline -->
             <div class="col-lg-7">
                 <div class="card card-custom h-100 p-4">
-                    <h6 class="text-mauve fw-bold border-bottom border-secondary pb-3 mb-3">مراقبة رحلة العميل (Customer Journey Risk Chart)</h6>
+                    <h6 class="text-mauve fw-bold border-bottom border-secondary pb-3 mb-3">مراقبة رحلة العميل (Customer Journey Risk Score)</h6>
                     <div style="height: 240px;">
                         <canvas id="riskChart"></canvas>
                     </div>
                     
                     <hr class="border-secondary my-3">
-                    <h6 class="text-mauve fs-6 fw-bold"><i class="bi bi-terminal-fill me-1"></i> سجل الأحداث السلوكية (Audit Log)</h6>
+                    <h6 class="text-mauve fs-6 fw-bold"><i class="bi bi-terminal-fill me-1"></i> سجل الأحداث اللحظي (System Audit Log)</h6>
                     <div id="auditLog" class="p-3 small overflow-auto mt-2" style="height: 110px;">
-                        [SYSTEM]: HOSN Fraud Engine Ready...
+                        [SYSTEM]: HOSN Fraud Intelligence Engine initialized...
                     </div>
                 </div>
             </div>
