@@ -3,90 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حُصن | HOSN - منصة ذكاء الاحتيال والمخاطر</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <title>حُصن | HOSN - Real-Time Fraud Intelligence</title>
+    
+    <!-- Bootstrap 5 RTL CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Chart.js Library -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Custom CSS File -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
 </head>
 <body>
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <a class="navbar-brand fw-bold text-mauve fs-3 d-flex align-items-center gap-2" href="#">
-                <i class="bi bi-shield-lock-fill"></i> حُصن | HOSN 
-                <span class="badge bg-mauve-badge fs-6">v1.0 Live</span>
+    <!-- 1. شريط الملاحة العلوي (Navbar) -->
+    <nav class="navbar navbar-expand-lg mb-4">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+                <i class="bi bi-shield-check text-mauve fs-3" style="color: var(--accent-mauve);"></i>
+                <span class="fw-bold fs-4 text-white">حُصن | HOSN</span>
+                <span class="badge-version ms-2">v1.0 Live</span>
             </a>
-            <span class="text-muted small d-none d-md-inline">
-                Fraud Intelligence & Risk Correlation Platform
-            </span>
+            <div class="d-none d-md-block ms-auto">
+                <span class="text-white-50 fs-6">Fraud Intelligence & Risk Correlation Platform</span>
+            </div>
         </div>
     </nav>
 
-    <div class="container my-4">
-        <!-- Live Operations Panel -->
-        <div class="alert alert-custom p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
-            <div>
-                <h5 class="mb-1 text-mauve fw-bold"><i class="bi bi-sliders me-1"></i> وحدة التشغيل ومحاكاة المخاطر اللحظية</h5>
-                <p class="mb-0 text-muted small">منظومة أمنية استباقية لربط الإشارات السلوكية والمالية واكتشاف التهديدات فور وقوعها.</p>
-            </div>
-            <div class="d-flex gap-2 flex-wrap">
-                <button onclick="runSimulation('normal')" class="btn btn-mauve-outline btn-sm px-3">
-                    <i class="bi bi-check-circle-fill text-success me-1"></i> محاكاة سلوك اعتيادي
-                </button>
-                <button onclick="runSimulation('account_takeover')" class="btn btn-mauve-outline btn-sm px-3">
-                    <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i> محاكاة هجوم (ATO)
-                </button>
-                <button onclick="runSimulation('suspicious_transaction')" class="btn btn-mauve-outline btn-sm px-3">
-                    <i class="bi bi-currency-dollar text-warning me-1"></i> محاكاة معاملة عالية المخاطر
-                </button>
+    <div class="container-fluid px-4">
+        <!-- 2. وحدة التشغيل ومحاكاة المخاطر (Operations Panel) -->
+        <div class="card p-3 mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <div>
+                        <h5 class="card-title text-white mb-1"><i class="bi bi-sliders me-2"></i>وحدة التشغيل ومحاكاة المخاطر اللحظية</h5>
+                        <p class="text-white-50 mb-0">اختبار السلوكيات والأنماط المالية واكتشاف التهديدات فور وقوعها</p>
+                    </div>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <button class="btn btn-sim text-success border-success" onclick="runSimulation('normal')">
+                        <i class="bi bi-check-circle-fill me-1"></i> محاكاة سلوك اعتيادي
+                    </button>
+                    <button class="btn btn-sim text-warning border-warning" onclick="runSimulation('ato')">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> محاكاة هجوم (ATO)
+                    </button>
+                    <button class="btn btn-sim text-danger border-danger" onclick="runSimulation('fraud')">
+                        <i class="bi bi-currency-dollar me-1"></i> محاكاة معاملة عالية المخاطر
+                    </button>
+                </div>
             </div>
         </div>
 
-        <div class="row g-4 mt-1">
-            <!-- Left Panel: Live Risk Score & Meter -->
-            <div class="col-lg-5">
-                <div class="card card-custom h-100 p-4">
-                    <h6 class="text-mauve text-center fw-bold border-bottom border-secondary pb-3 mb-4">مؤشر تقييم المخاطر اللحظي</h6>
-                    <div class="text-center my-3">
-                        <div id="riskScoreDisplay" class="display-2 fw-bold text-mauve mb-2">0%</div>
-                        <div id="riskBadge" class="badge bg-mauve-badge px-3 py-2 fs-6">LOW RISK</div>
+        <div class="row">
+            <!-- 3. لوحة مؤشر التقييم والقرار (Risk Intelligence Panel) -->
+            <div class="col-lg-5 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-white"><i class="bi bi-speedometer2 me-2"></i>مؤشر تقييم المخاطر اللحظي</h5>
                     </div>
-                    
-                    <div class="my-4">
-                        <label class="form-label text-muted small">القرار والتوصية الأمنية:</label>
-                        <div id="recommendationBox" class="p-3 rounded-3 bg-dark border border-secondary text-center fw-bold text-light">
-                            في انتظار استقبال بيانات السلوك...
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <!-- عارض النسبة المئوية والتقييم -->
+                        <div class="text-center my-3">
+                            <div id="riskScoreDisplay" class="display-1 fw-bold text-success mb-2">0%</div>
+                            <span id="riskLevelBadge" class="status-badge status-low">مخاطر منخفضة - LOW</span>
                         </div>
-                    </div>
 
-                    <!-- Risk Factors Breakdown -->
-                    <h6 class="text-mauve fs-6 fw-bold mt-2"><i class="bi bi-list-nested me-1"></i> تفاصيل مؤشرات الخطر (Risk Analysis):</h6>
-                    <div id="riskFactorsList" class="small text-muted mt-2">
-                        لا توجد إشارات مشبوهة حالياً.
+                        <!-- التوصية والقرار الأمنـي -->
+                        <div class="p-3 rounded bg-dark border border-secondary mb-3">
+                            <small class="text-white-50 d-block mb-1">القرار والتوصية الأمنية:</small>
+                            <div id="recommendationText" class="fw-bold text-white fs-6">سماح فوري بالعملية (ACTION_ALLOW)</div>
+                        </div>
+
+                        <!-- قائمة أسباب ومعاملات الخطر -->
+                        <div>
+                            <h6 class="text-white-50 mb-2">تفكيك إشارات الخطر Mapped Factors:</h6>
+                            <ul id="riskFactorsList" class="list-group list-group-flush border-0">
+                                <li class="list-group-item bg-transparent text-white-50 px-0 border-secondary">
+                                    <i class="bi bi-check2-circle text-success me-2"></i> لم يتم رصد أي مؤشرات مشبوهة
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Panel: Chart & Journey Timeline -->
-            <div class="col-lg-7">
-                <div class="card card-custom h-100 p-4">
-                    <h6 class="text-mauve fw-bold border-bottom border-secondary pb-3 mb-3">مراقبة رحلة العميل (Customer Journey Risk Score)</h6>
-                    <div style="height: 240px;">
-                        <canvas id="riskChart"></canvas>
+            <!-- 4. لوحة الرسم البياني والسجل التشغيلي (Analytics & Audit Panel) -->
+            <div class="col-lg-7 mb-4">
+                <!-- المخطط البياني الديناميكي -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-white"><i class="bi bi-graph-up-arrow me-2"></i>مخطط مسار مخاطر رحلة العميل (Trend Chart)</h5>
                     </div>
-                    
-                    <hr class="border-secondary my-3">
-                    <h6 class="text-mauve fs-6 fw-bold"><i class="bi bi-terminal-fill me-1"></i> سجل الأحداث اللحظي (System Audit Log)</h6>
-                    <div id="auditLog" class="p-3 small overflow-auto mt-2" style="height: 110px;">
-                        [SYSTEM]: HOSN Fraud Intelligence Engine initialized...
+                    <div class="card-body">
+                        <canvas id="riskTrendChart" height="130"></canvas>
+                    </div>
+                </div>
+
+                <!-- شاشة السجل البرمجي Audit Log -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 text-white"><i class="bi bi-terminal me-2"></i>السجل التشغيلي البرمجي (Audit Log)</h5>
+                        <small class="text-white-50">Real-time Telemetry</small>
+                    </div>
+                    <div class="card-body p-2">
+                        <div id="terminalLog" class="terminal-window">
+                            <div class="terminal-line">[SYSTEM] المنظومة تعمل بنجاح وجاهزة لاستقبال البيانات...</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <!-- JavaScript التفاعلي للـ Frontend -->
+    <script>
+        // إعداد المخطط البياني Chart.js
+        const ctx = document.getElementById('riskTrendChart').getContext('2d');
+        const riskTrendChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['الخطوة 1', 'الخطوة 2', 'الخطوة 3', 'الخطوة 4', 'الخطوة 5'],
+                datasets: [{
+                    label: 'مستوى المخاطرة %',
+                    data: [10, 15, 12, 10, 5],
+                    borderColor: '#B59CAE',
+                    backgroundColor: 'rgba(181, 156, 174, 0.15)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { min: 0, max: 100, ticks: { color: '#cbd5e1' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                    x: { ticks: { color: '#cbd5e1' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                },
+                plugins: { legend: { labels: { color: '#ffffff' } } }
+            }
+        });
+
+        // دالة إضافة سطر في السجل التشغيلي Terminal
+        function logToTerminal(message) {
+            const terminal = document.getElementById('terminalLog');
+            const now = new Date().toLocaleTimeString('en-US', { hour12: false });
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.innerText = `[${now}] ${message}`;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // دالة إرسال سيناريو المحاكاة للـ Backend
+        async function runSimulation(scenarioType) {
+            let payload = {};
+            if (scenarioType === 'normal') {
+                payload = { is_new_device: false, vpn_or_proxy: false, ip_country_changed: false, typing_speed_ms: 180, failed_login_attempts: 0, amount: 200, avg_user_amount: 250 };
+            } else if (scenarioType === 'ato') {
+                payload = { is_new_device: true, vpn_or_proxy: true, ip_country_changed: true, typing_speed_ms: 25, failed_login_attempts: 4, amount: 300, avg_user_amount: 250 };
+            } else if (scenarioType === 'fraud') {
+                payload = { is_new_device: true, vpn_or_proxy: false, ip_country_changed: false, typing_speed_ms: 110, failed_login_attempts: 1, amount: 9500, avg_user_amount: 400 };
+            }
+
+            logToTerminal(`تشغيل محاكاة: [${scenarioType.toUpperCase()}] ...`);
+
+            try {
+                const response = await fetch('/api/assess_risk', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                updateUI(data);
+                logToTerminal(`تم التقييم بنجاح: Risk Score = ${data.risk_score}% | Decision = ${data.action_code}`);
+            } catch (err) {
+                logToTerminal(`خطأ في الاتصال بالخادم: ${err.message}`);
+            }
+        }
+
+        // دالة تحديث عناصر الواجهة بعد تقييم المخاطر
+        function updateUI(data) {
+            const scoreDisplay = document.getElementById('riskScoreDisplay');
+            const levelBadge = document.getElementById('riskLevelBadge');
+            const recText = document.getElementById('recommendationText');
+            const factorsList = document.getElementById('riskFactorsList');
+
+            scoreDisplay.innerText = data.risk_score + '%';
+            recText.innerText = data.recommendation;
+
+            // ضبط الألوان والحالات
+            if (data.risk_score < 20) {
+                scoreDisplay.className = 'display-1 fw-bold text-success mb-2';
+                levelBadge.className = 'status-badge status-low';
+                levelBadge.innerText = 'مخاطر منخفضة - LOW';
+            } else if (data.risk_score < 45) {
+                scoreDisplay.className = 'display-1 fw-bold text-warning mb-2';
+                levelBadge.className = 'status-badge status-medium';
+                levelBadge.innerText = 'مخاطر متوسطة - MEDIUM';
+            } else if (data.risk_score < 75) {
+                scoreDisplay.className = 'display-1 fw-bold text-orange mb-2';
+                levelBadge.style.color = 'var(--color-high)';
+                levelBadge.className = 'status-badge status-high';
+                levelBadge.innerText = 'مخاطر عالية - HIGH';
+            } else {
+                scoreDisplay.className = 'display-1 fw-bold text-danger mb-2';
+                levelBadge.className = 'status-badge status-critical';
+                levelBadge.innerText = 'مخاطر حرجة - CRITICAL';
+            }
+
+            // تحديث قائمة العوامل المكتشفة
+            factorsList.innerHTML = '';
+            if (data.risk_factors.length === 0) {
+                factorsList.innerHTML = '<li class="list-group-item bg-transparent text-white-50 px-0 border-secondary"><i class="bi bi-check2-circle text-success me-2"></i> لا توجد إشارات خطر مُسجلة</li>';
+            } else {
+                data.risk_factors.forEach(factor => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item bg-transparent text-white px-0 border-secondary d-flex justify-content-between align-items-center';
+                    li.innerHTML = `<span><i class="bi bi-exclamation-circle text-warning me-2"></i>${factor.signal}</span> <span class="badge bg-danger">${factor.impact}</span>`;
+                    factorsList.appendChild(li);
+                });
+            }
+
+            // تحديث الرسم البياني
+            const currentData = riskTrendChart.data.datasets[0].data;
+            currentData.shift();
+            currentData.push(data.risk_score);
+            riskTrendChart.update();
+        }
+    </script>
 </body>
 </html>
