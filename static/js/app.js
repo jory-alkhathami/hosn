@@ -1,9 +1,106 @@
+let riskChart;
+let journeyHistory = [10, 12, 15, 14, 11];
 
-let data=null,revealed=0,score=0;const $=id=>document.getElementById(id);function showView(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));$(id).classList.add('on');document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('on',n.dataset.view===id));window.scrollTo(0,0)}document.querySelectorAll('.nav').forEach(n=>n.onclick=()=>showView(n.dataset.view));
-function levelFor(s){if(s>=70)return['مرتفع','high'];if(s>=35)return['مراقبة','watch'];return['منخفض','']}function pill(level){return level==='مرتفع'?'high':level==='مراقبة'?'watch':''}
-async function loadCases(){const cases=await(await fetch('/api/cases')).json();const rows=cases.map(c=>`<tr class="rowlink" onclick="openCase('${c.scenario}')"><td>${c.id}</td><td>${c.customer}</td><td>${c.amount}</td><td><span class="scoreline">${c.score} / 100</span></td><td><span class="pill ${pill(c.level)}">${c.level}</span></td></tr>`).join('');$('caseRows').innerHTML=rows;$('allCaseRows').innerHTML=cases.map(c=>`<tr class="rowlink" onclick="openCase('${c.scenario}')"><td>${c.id}</td><td>${c.customer}</td><td>${c.time}</td><td>${c.amount}</td><td><span class="scoreline">${c.score} / 100</span></td><td><span class="pill ${pill(c.level)}">${c.level}</span></td><td>${c.status}</td></tr>`).join('')}
-function explanation(){if(revealed===0)return'ابدأ المحاكاة لمشاهدة كيف تتراكم الإشارات ويُعاد تقييم الحالة بعد كل حدث.';const r=data.events.slice(0,revealed).filter(e=>e.delta>=12).length;if(score>=70)return`وصلت الحالة إلى مستوى مرتفع بعد ترابط ${r} إشارات مؤثرة. التقييم لا يعتمد على حدث منفرد.`;if(score>=35)return'تراكمت إشارات تستحق المراقبة. يستمر النظام في إعادة التقييم مع وصول أحداث جديدة.';return'الإشارات الظاهرة حتى الآن لا تكفي وحدها لرفع الحالة عن المستوى المنخفض.'}
-function renderTimeline(){$('timeline').innerHTML=data.events.map((e,i)=>`<div class="event ${i<revealed?'revealed':''} ${i===revealed-1?'current':''}"><span class="label">${e.time}</span><div><div class="event-title">${e.title}</div><div class="event-detail">${i<revealed?e.detail:'بانتظار الحدث...'}</div></div><strong class="delta">${i<revealed?(e.delta?`+${e.delta}`:'0'):'—'}</strong><span class="tag ${i<revealed?(e.status==='مرتفع'?'high':e.status==='مراقبة'?'watch':''):''}">${i<revealed?e.status:'معلق'}</span></div>`).join('')}
-function renderEngine(){$('engineRows').innerHTML=data.events.map((e,i)=>`<div class="engine-row ${i<revealed?'':'muted'}"><span>${e.category}: ${e.title}</span><span class="weight">${i<revealed?(e.delta?`+${e.delta}`:'0'):'—'}</span></div>`).join('')}
-function update(){const[lvl,cls]=levelFor(score);$('score').textContent=score;$('metricScore').textContent=score;$('fill').style.width=score+'%';$('metricLevel').textContent=lvl;$('signals').textContent=revealed;$('levelBadge').textContent=lvl;$('levelBadge').className='level '+cls;$('reason').textContent=explanation();$('progressText').textContent=`${revealed} من ${data.events.length} أحداث`;$('nextBtn').disabled=revealed>=data.events.length;$('liveState').textContent=revealed===0?'جاهز للمحاكاة':revealed<data.events.length?'المحاكاة جارية':'اكتمل التحليل';$('action').textContent=score>=70?data.action:score>=35?'استمرار المراقبة':'السماح مع المراقبة';renderTimeline();renderEngine();$('score').classList.remove('pulse');void $('score').offsetWidth;$('score').classList.add('pulse')}
-async function selectScenario(name){data=await(await fetch('/api/scenario/'+name)).json();revealed=0;score=data.base_score;$('scenarioName').textContent=data.name;$('caseId').textContent=data.id;$('customer').textContent=data.customer;$('account').textContent=data.account;$('amount').textContent=data.amount;update()}async function openCase(name){await selectScenario(name);showView('analysis')}function nextEvent(){if(!data||revealed>=data.events.length)return;score=Math.min(100,score+data.events[revealed].delta);revealed++;update()}function resetSimulation(){revealed=0;score=data.base_score;update()}loadCases();selectScenario('fraud');
+document.addEventListener("DOMContentLoaded", function () {
+    initChart();
+});
+
+function initChart() {
+    const ctx = document.getElementById('riskChart').getContext('2d');
+    riskChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['خطوة 1', 'خطوة 2', 'خطوة 3', 'خطوة 4', 'خطوة 5'],
+            datasets: [{
+                label: 'مستوى المخاطرة (%)',
+                data: journeyHistory,
+                borderColor: '#198754',
+                backgroundColor: 'rgba(25, 135, 84, 0.2)',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { min: 0, max: 100, grid: { color: '#333' } },
+                x: { grid: { color: '#333' } }
+            },
+            plugins: { legend: { labels: { color: '#fff' } } }
+        }
+    });
+}
+
+function runSimulation(type) {
+    appendLog(`[REQUEST]: إرسال طلب محاكاة نوع: ${type}`);
+    
+    fetch(`/api/simulate/${type}`)
+        .then(response => response.json())
+        .then(data => {
+            updateDashboard(data);
+        })
+        .catch(err => {
+            appendLog(`[ERROR]: فشل الاتصال بالسيرفر: ${err}`);
+        });
+}
+
+function updateDashboard(data) {
+    const score = data.risk_score;
+    const scoreDisplay = document.getElementById('riskScoreDisplay');
+    const badge = document.getElementById('riskBadge');
+    const recBox = document.getElementById('recommendationBox');
+    const factorsList = document.getElementById('riskFactorsList');
+
+    scoreDisplay.innerText = `${score}%`;
+
+    let colorClass = 'text-success';
+    let bgBadge = 'bg-success';
+    let borderColor = '#198754';
+
+    if (score >= 75) {
+        colorClass = 'text-danger';
+        bgBadge = 'bg-danger';
+        borderColor = '#dc3545';
+    } else if (score >= 45) {
+        colorClass = 'text-warning';
+        bgBadge = 'bg-warning text-dark';
+        borderColor = '#ffc107';
+    }
+
+    scoreDisplay.className = `display-1 fw-bold ${colorClass}`;
+    badge.className = `badge ${bgBadge} fs-6 mt-2`;
+    badge.innerText = `${data.risk_level} RISK`;
+    recBox.innerText = data.recommendation;
+
+    factorsList.innerHTML = '';
+    if (data.risk_factors.length === 0) {
+        factorsList.innerHTML = '<div class="text-success"><i class="bi bi-check-circle-fill"></i> لا توجد مؤشرات خطر. السلوك اعتيادي.</div>';
+    } else {
+        data.risk_factors.forEach(f => {
+            factorsList.innerHTML += `
+                <div class="alert alert-dark border-secondary py-1 px-2 mb-1 d-flex justify-content-between align-items-center">
+                    <span>${f.signal}</span>
+                    <span class="badge bg-danger">${f.impact}</span>
+                </div>
+            `;
+        });
+    }
+
+    journeyHistory.push(score);
+    if (journeyHistory.length > 7) journeyHistory.shift();
+    
+    riskChart.data.datasets[0].data = journeyHistory;
+    riskChart.data.datasets[0].borderColor = borderColor;
+    riskChart.data.datasets[0].backgroundColor = `${borderColor}33`;
+    riskChart.update();
+
+    appendLog(`[RESPONSE]: النتيجة: ${score}% | القرار: ${data.action_code}`);
+}
+
+function appendLog(msg) {
+    const logBox = document.getElementById('auditLog');
+    const time = new Date().toLocaleTimeString('ar-SA');
+    logBox.innerHTML += `<div>[${time}] ${msg}</div>`;
+    logBox.scrollTop = logBox.scrollHeight;
+}
